@@ -1,8 +1,6 @@
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 from pathlib import Path
 
 # Obter o diretório do arquivo atual e configurar o caminho
@@ -53,22 +51,38 @@ with abas[2]:
 
 # Aba do gráfico
 with abas[3]:
-    # Fixar o estado aleatório para reprodutibilidade
-    np.random.seed(19680801)
+    st.subheader("Gráfico do Fechamento do Ibovespa ao longo do tempo")
 
-    # Dados de exemplo
-    fig, ax = plt.subplots()
-    people = ('Tom', 'Dick', 'Harry', 'Slim', 'Jim')
-    y_pos = np.arange(len(people))
-    performance = 3 + 10 * np.random.rand(len(people))
-    error = np.random.rand(len(people))
+    if caminho.exists():
+        df = pd.read_csv(caminho)
 
-    # Criando o gráfico de barras horizontais
-    ax.barh(y_pos, performance, xerr=error, align='center')
-    ax.set_yticks(y_pos, labels=people)
-    ax.invert_yaxis()  # Inverter ordem das labels
-    ax.set_xlabel('Performance')
-    ax.set_title('How fast do you want to go today?')
+        # Verificar se as colunas necessárias existem
+        if 'data' in df.columns and 'fechamento' in df.columns:
+            # Converter a coluna 'data' para o tipo datetime
+            df['data'] = pd.to_datetime(df['data'])
 
-    # Exibir o gráfico no Streamlit
-    st.pyplot(fig)
+            # Criar o gráfico de linha para o valor de fechamento do Ibovespa ao longo do tempo
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.plot(df['data'], df['fechamento'], label='Fechamento Ibovespa', color='b')
+
+            # Configurar o título e os rótulos do gráfico
+            ax.set_title('Fechamento do Ibovespa ao longo do tempo', fontsize=14)
+            ax.set_xlabel('Data', fontsize=12)
+            ax.set_ylabel('Fechamento (R$)', fontsize=12)
+
+            # Adicionar uma grade
+            ax.grid(True)
+
+            # Mostrar a legenda
+            ax.legend()
+
+            # Ajustar os ticks e layout
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+
+            # Exibir o gráfico no Streamlit
+            st.pyplot(fig)
+        else:
+            st.error("O arquivo não contém as colunas necessárias ('data' e 'fechamento').")
+    else:
+        st.error("Arquivo não encontrado: " + str(caminho))
