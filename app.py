@@ -34,7 +34,7 @@ with abas [1]:
         st.error('voce é um perdedor')
 with abas[2]:
     caminho = "/Users/luigiajello/Desktop/oi xD/ibov.csv"
-    #df = pd.read_csv(caminho + "\\ibov.csv") caso se precisar
+    df = pd.read_csv(caminho + "\\ibov.csv") 
     df = pd.read_csv(caminho)
     st.dataframe(df)
 
