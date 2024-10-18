@@ -1,55 +1,74 @@
+
+import streamlit as st
+import pandas as pd
 import matplotlib.pyplot as plt
-import streamlit as st 
-import pandas as pd 
+import numpy as np
+from pathlib import Path
 
+# Obter o diretório do arquivo atual e configurar o caminho
+caminho = Path(__file__).resolve().parent / "data" / "ibov.csv"
 
-st.title('Meu primeiro dashboard')
-st.header('Esse é um header')
-abas = st.tabs(["Botao","Radio","Dataframe","grafico"])
+# Título e cabeçalho do app
+st.title("Meu primeiro dashboard")
+st.header("Esse é um header")
 
+# Exemplo de Markdown
 st.markdown(
     '''
-    # Header
-    ## Title
-    ### Sub title
-    #### jjjjjjjj
+    # 1
+    ## 2
+    ### 3
     '''
 )
 
-with abas [0]:
-    if st.button('clique aqui'):
-        st.text('Voce apertou o botao')
+# Criação de abas
+abas = st.tabs(["Botão", "Radio", "DataFrame", "Gráfico"])
 
-with abas [1]:
-    opcao = st.radio(
-        'Escolha a opção:',
-        ('Flamengo', 'Corinthias', 'Palmeiras')
-    )
+# Aba do botão
+with abas[0]:
+    if st.button("Clique aqui"):
+        st.text("Você apertou o botão")
 
-    if opcao == 'Flamengo':
-        st.info('voce um urubu')
-    elif opcao == 'Corinthias':
-        st.warning ('voce e um campeao')
-    else: 
-        st.error('voce é um perdedor')
+# Aba do radio (com a escolha do time)
+with abas[1]:
+    opcao = st.radio("Escolha seu time:", ["flamengo", "corinthians", "outro"])
+    
+    if opcao == "flamengo":
+        st.info("Você é um urubu")
+    elif opcao == "corinthians":
+        st.warning("Você é um bobo")
+    else:
+        st.error("Você é um perdedor")
+
+# Aba do DataFrame
 with abas[2]:
-    caminho = "/Users/luigiajello/Desktop/oi xD/ibov.csv"
-    df = pd.read_csv(caminho + "\\ibov.csv") 
-    df = pd.read_csv(caminho)
-    st.dataframe(df)
+    st.subheader("Exibição do DataFrame")
+    
+    # Verificar se o arquivo existe e, em caso afirmativo, exibir o DataFrame
+    if caminho.exists():
+        df = pd.read_csv(caminho)
+        st.dataframe(df)
+    else:
+        st.error("Arquivo não encontrado: " + str(caminho))
 
-with abas [3]:
+# Aba do gráfico
+with abas[3]:
+    # Fixar o estado aleatório para reprodutibilidade
+    np.random.seed(19680801)
+
+    # Dados de exemplo
     fig, ax = plt.subplots()
+    people = ('Tom', 'Dick', 'Harry', 'Slim', 'Jim')
+    y_pos = np.arange(len(people))
+    performance = 3 + 10 * np.random.rand(len(people))
+    error = np.random.rand(len(people))
 
-    fruits = ['apple', 'blueberry', 'cherry', 'orange']
-    counts = [40, 100, 30, 55]
-    bar_labels = ['red', 'blue', '_red', 'orange']
-    bar_colors = ['tab:red', 'tab:blue', 'tab:red', 'tab:orange']
+    # Criando o gráfico de barras horizontais
+    ax.barh(y_pos, performance, xerr=error, align='center')
+    ax.set_yticks(y_pos, labels=people)
+    ax.invert_yaxis()  # Inverter ordem das labels
+    ax.set_xlabel('Performance')
+    ax.set_title('How fast do you want to go today?')
 
-    ax.bar(fruits, counts, label=bar_labels, color=bar_colors)
-
-    ax.set_ylabel('fruit supply')
-    ax.set_title('Fruit supply by kind and color')
-    ax.legend(title='Fruit color')
-
+    # Exibir o gráfico no Streamlit
     st.pyplot(fig)
